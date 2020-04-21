@@ -2,7 +2,7 @@ package wuziqi;
 
 import java.util.Scanner;
 
-public class wuZiQiPlay {
+public class WuZiQiPlay {
     public static void main(String[] args) {
         System.out.println("================" + "开始五子棋游戏" + "================");
         Scanner sc = new Scanner(System.in);
@@ -13,13 +13,13 @@ public class wuZiQiPlay {
         // 设置参赛人员并且赋值
         String[] members = new String[] {blackName, whiteName};
         boolean play = true;
-        wuZiQi wuZiQiPan = new wuZiQi();
+        WuZiQi wuZiQiPan = new WuZiQi();
         while (play) {
             for (int i = 0; i < members.length; i++) {
-                qiZi currentQiZi = qiZi.CURRENT_BLACK;
+                QiZi currentQiZi = QiZi.CURRENT_BLACK;
                 String member = blackName;
                 if (i == 1) {
-                    currentQiZi = qiZi.CURRENT_WHITE;
+                    currentQiZi = QiZi.CURRENT_WHITE;
                     member = whiteName;
                 }
                 System.out.println("请" + member + "输入第几行落点");

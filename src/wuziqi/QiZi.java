@@ -1,6 +1,6 @@
 package wuziqi;
 
-public enum qiZi {
+public enum QiZi {
     BLACK(1, '●'),
     WHITE(2, '○'),
     CURRENT_BLACK(1, '■'),
@@ -9,7 +9,7 @@ public enum qiZi {
     private int code;
     private char value;
 
-    private qiZi(int code, char value){
+    private QiZi(int code, char value){
         this.code = code;
         this.value = value;
 
