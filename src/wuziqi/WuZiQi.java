@@ -93,8 +93,8 @@ public class WuZiQi {
         strategies[3] = new NegativeAxiesStartegy();
 
         boolean checkRes = false;
-        for(int i=0; i<strategies.length; i++){
-            if(checkContext.run(strategies[i], x, y, qizi, wuziqipan, checkCode)){
+        for(Strategy strategy: strategies){
+            if(checkContext.run(strategy, x, y, qizi, wuziqipan, checkCode)){
                 checkRes = true;
                 break;
             }
