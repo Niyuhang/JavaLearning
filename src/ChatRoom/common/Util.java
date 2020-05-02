@@ -27,7 +27,7 @@ public class Util {
         else if (userName.contains(CONNECT_WITH_CLIENT_PATTERN)){
             throw new ValueException(String.format("当前用户名不能包含%s字符", CONNECT_WITH_CLIENT_PATTERN));
         }
-        else if (userName.trim() == ADMIN){
+        else if (userName.trim().equals(ADMIN)){
             throw new ValueException("当前用户名不能和管理员重名");
         }
         return true;

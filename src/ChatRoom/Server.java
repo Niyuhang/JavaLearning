@@ -1,6 +1,7 @@
 package ChatRoom;
 
 import static ChatRoom.common.Constant.*;
+
 import ChatRoom.common.*;
 import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 
@@ -66,7 +67,19 @@ public class Server {
                 while (true) {
                     // 服务端只需要不断的处理收到的请求 然后进行回应
                     Message message = exchangeMessage.receive();
-                    exchangeMessage.send(message);
+                    String messageContent = message.getMessage();
+                    if (message.getTo().equalsIgnoreCase(ADMIN)) {
+                        // 处理发送给管理员的请求
+                        System.out.println(message);
+                        // todo: 处理发来的信息
+                        exchangeMessage.send(new Message(ADMIN, message.getFrom(), USERNAME_PASS + ":" + messageContent));
+                    } else {
+                        // 处理发送给管理员的请求
+                        // todo: 进行转发
+                        System.out.println("客户端的信息" + messageContent);
+                        exchangeMessage.send(new Message(NO_NAME, message.getFrom(), messageContent));
+                    }
+
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -79,18 +92,17 @@ public class Server {
             exchangeMessage.send(new Message(NO_NAME, ADMIN, INIT_CLIENT_WORD));
 
             // 不断接受信息，然后进行判定用户名，通过后发送pass 和 欢迎语
-            while(true){
+            while (true) {
                 Message message = exchangeMessage.receive();
                 System.out.println("这次的消息" + message.getMessage());
                 String clientUserName = message.getMessage();
-                try{
+                try {
                     Util.isValidUserName(clientUserName, users);
-                    exchangeMessage.send(new Message(clientUserName, ADMIN, USERNAME_PASS));
-                    exchangeMessage.send(new Message(clientUserName, ADMIN, WELCOME));
+                    exchangeMessage.send(new Message(ADMIN, clientUserName, USERNAME_PASS));
+                    exchangeMessage.send(new Message(ADMIN, clientUserName, WELCOME));
                     break;
-                }
-                catch (ValueException ex){
-                    exchangeMessage.send(new Message(NO_NAME, ADMIN, ex.toString()));
+                } catch (ValueException ex) {
+                    exchangeMessage.send(new Message(NO_NAME, ADMIN, "错误信息" + ex.getMessage()));
                 }
 
             }
