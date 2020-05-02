@@ -1,7 +1,12 @@
 package ChatRoom;
 
+import static ChatRoom.common.Constant.*;
 import ChatRoom.common.*;
+import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Scanner;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -14,7 +19,7 @@ public class Server {
     private final ServerSocket serverSocket;
     private final Scanner sc = new Scanner(System.in);
     private ExecutorService serverPool = Executors.newCachedThreadPool();
-    // TODO: 存储用户名 以及对应的socket用来进行转发
+    private Map<String, ExchangeMessage> users = new ConcurrentHashMap<>();
 
     // 初始化自身的参数
     public Server() throws IOException {
@@ -37,16 +42,18 @@ public class Server {
      * @param socket:
      */
     private void handleClient(Socket socket) {
-        serverPool.submit(new HandlerClient(socket));
+        serverPool.submit(new HandlerClient(socket, users));
     }
 
 
     static class HandlerClient implements Runnable {
 
         private final Socket socket;
+        private final Map users;
 
-        private HandlerClient(Socket socket) {
+        private HandlerClient(Socket socket, Map users) {
             this.socket = socket;
+            this.users = users;
         }
 
         @Override
@@ -55,16 +62,40 @@ public class Server {
             // todo: 处理逻辑
             try {
                 ExchangeMessage exchangeMessage = new ExchangeMessage(socket);
+                initClient(exchangeMessage);
                 while (true) {
                     // 服务端只需要不断的处理收到的请求 然后进行回应
-                    String message = exchangeMessage.receive();
-                    exchangeMessage.send("给你的消息" + message);
+                    Message message = exchangeMessage.receive();
+                    exchangeMessage.send(message);
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+
+        private void initClient(ExchangeMessage exchangeMessage) throws IOException {
+            System.out.println("初始化客户端信息");
+            // 发送输入用户名信息
+            exchangeMessage.send(new Message(NO_NAME, ADMIN, INIT_CLIENT_WORD));
+
+            // 不断接受信息，然后进行判定用户名，通过后发送pass 和 欢迎语
+            while(true){
+                Message message = exchangeMessage.receive();
+                System.out.println("这次的消息" + message.getMessage());
+                String clientUserName = message.getMessage();
+                try{
+                    Util.isValidUserName(clientUserName, users);
+                    exchangeMessage.send(new Message(clientUserName, ADMIN, USERNAME_PASS));
+                    exchangeMessage.send(new Message(clientUserName, ADMIN, WELCOME));
+                    break;
+                }
+                catch (ValueException ex){
+                    exchangeMessage.send(new Message(NO_NAME, ADMIN, ex.toString()));
+                }
+
+            }
+        }
+
     }
 
 }

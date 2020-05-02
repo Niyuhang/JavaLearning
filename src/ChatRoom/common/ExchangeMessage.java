@@ -34,11 +34,16 @@ public class ExchangeMessage {
         return Message.generateMessage(line);
     }
 
-    public void send(String message) {
+    /**
+     * 发送信息
+     * @param message
+     */
+    public void send(Message message) {
         // 利用println 而不是利用write
-        fw.println(message);
+        fw.println(message.toString());
         fw.flush();
     }
+
 
     /**
      * 关闭当前数据中转服务
