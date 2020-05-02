@@ -23,7 +23,7 @@ public class ExchangeMessage {
         reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
 
-    public String receive() throws IOException {
+    public Message receive() throws IOException {
         String line;
         while (true) {
             line = reader.readLine();
@@ -31,7 +31,7 @@ public class ExchangeMessage {
                 break;
             }
         }
-        return line;
+        return Message.generateMessage(line);
     }
 
     public void send(String message) {

@@ -14,7 +14,7 @@ public class Server {
     private final ServerSocket serverSocket;
     private final Scanner sc = new Scanner(System.in);
     private ExecutorService serverPool = Executors.newCachedThreadPool();
-    // TODO: 存储用户名
+    // TODO: 存储用户名 以及对应的socket用来进行转发
 
     // 初始化自身的参数
     public Server() throws IOException {

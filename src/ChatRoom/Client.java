@@ -11,6 +11,7 @@ public class Client {
     private final String HOST;
     private ExchangeMessage exchangeMessage;
     private Scanner sc = new Scanner(System.in);
+    // todo: 存储当前聊天的对象 和 自己的用户名
 
     public Client() {
         PORT = Config.PORT;
@@ -48,7 +49,7 @@ public class Client {
         Thread thread = new Thread(() -> {
             System.out.println("处理读取");
             while (true) {
-                String message;
+                Message message;
                 try {
                     message = exchangeMessage.receive();
                     System.out.println("收到消息" + message);
