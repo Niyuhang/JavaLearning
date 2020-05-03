@@ -7,6 +7,7 @@ public class Constant {
     public final static String CONNECT_WITH_CLIENT_PATTERN = "@";
     public final static String INIT_CLIENT_WORD = "请输入客户端的姓名";
     public final static String WELCOME = "欢迎来到本聊天室";
+    public final static String GET_USERS = "@users";
 
 
 }

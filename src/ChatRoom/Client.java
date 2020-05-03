@@ -106,6 +106,8 @@ public class Client {
                     if (message.getFrom().equalsIgnoreCase(ADMIN)) {
                         handleServerData(messageContent);
                     } else {
+                        // 收到客户端消息 当前toName就直接改变
+                        toName = message.getFrom();
                         System.out.println(String.format("收到消息来自%s的消息:%s", message.getFrom(), message.getMessage()));
                     }
                 } catch (Exception e) {
@@ -156,6 +158,9 @@ public class Client {
             String messageData = sc.nextLine();
             // 分析得到toName
             // 如果重新输入了@就更新 toName
+//            System.out.println(messageData);
+            // todo: 更新@对象失败
+            // todo: @admin
             if (messageData.startsWith(CONNECT_WITH_CLIENT_PATTERN)) {
                 String[] messages = messageData.split("\\s+");
                 String toName = messages[0].substring(1);

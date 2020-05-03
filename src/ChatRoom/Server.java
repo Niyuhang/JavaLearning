@@ -14,6 +14,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 public class Server {
     private final int SERVER_PORT;
@@ -46,11 +47,10 @@ public class Server {
         serverPool.submit(new HandlerClient(socket, users));
     }
 
-
     static class HandlerClient implements Runnable {
 
         private final Socket socket;
-        private final Map users;
+        private final Map<String, ExchangeMessage> users;
 
         private HandlerClient(Socket socket, Map users) {
             this.socket = socket;
@@ -72,18 +72,36 @@ public class Server {
                         // 处理发送给管理员的请求
                         System.out.println(message);
                         // todo: 处理发来的信息
-                        exchangeMessage.send(new Message(ADMIN, message.getFrom(), USERNAME_PASS + ":" + messageContent));
+                        exchangeMessage.send(handleAdminCommand(message));
                     } else {
-                        // 处理发送给管理员的请求
+                        // 处理发送给他人的消息
                         // todo: 进行转发
-                        System.out.println("客户端的信息" + messageContent);
-                        exchangeMessage.send(new Message(NO_NAME, message.getFrom(), messageContent));
+                        ExchangeMessage transformExchangeMessage = users.get(message.getTo());
+                        transformExchangeMessage.send(new Message(message.getFrom(), message.getTo(), messageContent));
                     }
 
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        private Message handleAdminCommand(Message message) {
+            String messageContent = message.getMessage();
+            if (messageContent.equalsIgnoreCase(GET_USERS)) {
+                return new Message(ADMIN, message.getFrom(), getUsers());
+            }
+            // 检查用户名
+            return new Message(ADMIN, message.getFrom(), USERNAME_PASS + ":" + messageContent);
+        }
+
+        /**
+         * 获取当前所有用户名
+         *
+         * @return：
+         */
+        private String getUsers() {
+            return users.keySet().stream().collect(Collectors.joining(";"));
         }
 
         private void initClient(ExchangeMessage exchangeMessage) throws IOException {
@@ -98,6 +116,7 @@ public class Server {
                 String clientUserName = message.getMessage();
                 try {
                     Util.isValidUserName(clientUserName, users);
+                    users.put(clientUserName, exchangeMessage);
                     exchangeMessage.send(new Message(ADMIN, clientUserName, USERNAME_PASS));
                     exchangeMessage.send(new Message(ADMIN, clientUserName, WELCOME));
                     break;
